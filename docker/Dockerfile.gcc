@@ -1,0 +1,45 @@
+FROM debian:11
+
+# install build essentials & git
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# clone riscv-gnu-toolchain
+# it takes a long time to download the source code, so make it a separate layer
+RUN git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+
+# I don't want to invalidate the cache :(
+RUN apt-get update && apt-get install -y \
+    autoconf automake autotools-dev curl python3 python3-pip \
+    libmpc-dev libmpfr-dev libgmp-dev gawk build-essential \
+    bison flex texinfo gperf libtool patchutils bc zlib1g-dev \
+    libexpat-dev ninja-build git cmake libglib2.0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# build riscv-gnu-toolchain with riscv64gc musl
+RUN cd riscv-gnu-toolchain && \
+    ./configure --prefix=/opt/riscv --with-arch=rv64gc --with-abi=lp64d && \
+    make musl -j$(nproc)
+
+# download libunwind
+
+RUN git clone https://github.com/libunwind/libunwind.git && \
+    cd libunwind && \
+    git checkout 4ffcf81c533bc57f30b019af80437db946ed058f
+
+COPY libunwind-ignore-coredump-test.patch libunwind/ignore-test.patch
+
+# build & install libunwind
+RUN export PATH=/opt/riscv/bin:$PATH && \ 
+    cd libunwind && \
+    autoreconf -i && \
+    ./configure --prefix=/opt/riscv/sysroot --host=riscv64-unknown-linux-musl && \
+    patch tests/Makefile ignore-test.patch && \
+    make -j$(nproc) && \
+    make install
+
+# Now we have a riscv64gc musl toolchain (riscv64-unknown-linux-musl) with libunwind installed in /opt/riscv/
+
+

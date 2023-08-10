@@ -1,0 +1,10 @@
+--- test-Makefile-bak	2023-08-10 20:11:09.952000000 +0800
++++ tests/Makefile	2023-08-10 20:15:38.064000000 +0800
+@@ -1397,7 +1397,6 @@
+ 
+ test-coredump-unwind$(EXEEXT): $(test_coredump_unwind_OBJECTS) $(test_coredump_unwind_DEPENDENCIES) $(EXTRA_test_coredump_unwind_DEPENDENCIES) 
+ 	@rm -f test-coredump-unwind$(EXEEXT)
+-	$(AM_V_CCLD)$(LINK) $(test_coredump_unwind_OBJECTS) $(test_coredump_unwind_LDADD) $(LIBS)
+ 
+ test-flush-cache$(EXEEXT): $(test_flush_cache_OBJECTS) $(test_flush_cache_DEPENDENCIES) $(EXTRA_test_flush_cache_DEPENDENCIES) 
+ 	@rm -f test-flush-cache$(EXEEXT)

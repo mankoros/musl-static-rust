@@ -1,0 +1,18 @@
+[build]
+target = "riscv64gc-unknown-linux-musl"
+
+[unstable]
+build-std = ["core", "std", "panic_abort"]
+
+[target.riscv64gc-unknown-linux-musl]
+rustflags = [
+    "-L/opt/riscv/sysroot/lib",
+    "-L/opt/riscv/lib/gcc/riscv64-unknown-linux-musl/12.0.1/",
+    "-L/opt/riscv/sysroot/usr/lib",
+    "-C",
+    "link-args=-lc",
+    "-C",
+    "target-feature=+crt-static",
+]
+ar = "/opt/riscv/bin/riscv64-unknown-linux-musl-ar"
+linker = "/opt/riscv/bin/riscv64-unknown-linux-musl-gcc"
