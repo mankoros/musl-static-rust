@@ -13,7 +13,9 @@ build:
 
 install:
 ifeq ("$(wildcard $(TOOLCHAIN_INSTALL))","")
-	make build-toolchain
+	make build
+# remove the old container if exists
+	docker rm -f $(TOOLCHAIN_IMG)-tmp || true
 	docker create --name $(TOOLCHAIN_IMG)-tmp $(TOOLCHAIN_IMG)
 	docker cp $(TOOLCHAIN_IMG)-tmp:/opt/riscv $(TOOLCHAIN_INSTALL)
 	docker rm $(TOOLCHAIN_IMG)-tmp
